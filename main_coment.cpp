@@ -1,0 +1,71 @@
+//=====[Declaración de objetos de clases DigitalIn, DigitalOut y DigitalInOut]=====
+// CLASES: DigitalIn, DigitalOut, DigitalInOut -> Son clases de Mbed para manejar pines de entrada y salida
+// CONSTRUCTOR: Se usa el constructor de cada clase para crear objetos con parámetros de inicialización (Ej. el pin correspondiente)
+// OBJETOS: Cada declaración es una instancia de las respectivas clases
+
+DigitalIn enterButton(BUTTON1);       // Objeto de la clase DigitalIn que representa el botón de entrada
+DigitalIn alarmTestButton(D2);        // Otro objeto de DigitalIn para la prueba de alarma
+DigitalIn aButton(D4);                // Objeto para el botón A
+DigitalIn bButton(D5);                // Objeto para el botón B
+DigitalIn cButton(D6);                // Objeto para el botón C
+DigitalIn dButton(D7);                // Objeto para el botón D
+DigitalIn mq2(PE_12);                 // Sensor MQ2 para detección de gases
+
+DigitalOut alarmLed(LED1);            // Objeto de DigitalOut para manejar el LED de alarma
+DigitalOut incorrectCodeLed(LED3);    // LED que indica código incorrecto
+DigitalOut systemBlockedLed(LED2);    // LED que indica sistema bloqueado
+
+DigitalInOut sirenPin(PE_10);         // Objeto que permite entrada/salida en el pin de la sirena
+
+//=====[Declaración de objeto de la clase UnbufferedSerial]===================
+// CLASE: UnbufferedSerial -> Maneja comunicación serial sin buffer en Mbed
+// INTERFAZ: La clase UnbufferedSerial proporciona una interfaz para comunicación serial con métodos como read() y write()
+// OBJETO: Creación de un objeto uartUsb usando el constructor de la clase UnbufferedSerial
+UnbufferedSerial uartUsb(USBTX, USBRX, 115200); // Comunicación serie con velocidad de 115200 baudios
+
+//=====[Declaración de objeto de la clase AnalogIn]==========================
+// CLASE: AnalogIn -> Maneja entradas analógicas en Mbed
+// CONSTRUCTOR: Recibe el pin analógico como argumento
+AnalogIn potentiometer(A0);           // Potenciómetro conectado a A0
+AnalogIn lm35(A1);                    // Sensor LM35 para temperatura conectado a A1
+
+//=====[Definición de una función con un mensaje entre objetos]=============
+// MENSAJE: La comunicación entre objetos ocurre cuando se llama a métodos de un objeto. Ejemplo: uartUsb.read()
+// INTERFAZ: La función uartTask() utiliza la interfaz de UnbufferedSerial para leer y escribir datos seriales
+
+void uartTask()
+{
+    char receivedChar = '\0';    // Variable para almacenar el carácter recibido
+    char str[100];
+    int stringLength;
+
+    if( uartUsb.readable() ) {   // Llamada a método readable() -> Verifica si hay datos disponibles
+        uartUsb.read( &receivedChar, 1 );  // MENSAJE -> Recibe un dato de la comunicación UART
+        
+        switch (receivedChar) {
+        case '1':
+            if ( alarmState ) {
+                uartUsb.write( "The alarm is activated\r\n", 24);  // MENSAJE -> Envío de mensaje por UART
+            } else {
+                uartUsb.write( "The alarm is not activated\r\n", 28);
+            }
+            break;
+        case 'p':
+        case 'P':
+            potentiometerReading = potentiometer.read();   // MENSAJE -> Llamada al método read() del objeto potentiometer
+            sprintf ( str, "Potentiometer: %.2f\r\n", potentiometerReading );  
+            stringLength = strlen(str);
+            uartUsb.write( str, stringLength );  // MENSAJE -> Transmisión del valor por UART
+            break;
+        }
+    }
+}
+
+//=====[Ejemplo de sobrecarga de método]=========================
+// CLASE: Se define sobrecarga en la función celsiusToFahrenheit(), ya que recibe diferentes tipos de datos
+
+float celsiusToFahrenheit( float tempInCelsiusDegrees )
+{
+    return ( tempInCelsiusDegrees * 9.0 / 5.0 + 32.0 );
+}
+
