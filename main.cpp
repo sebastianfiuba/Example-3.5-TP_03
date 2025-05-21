@@ -29,8 +29,10 @@ DigitalOut systemBlockedLed(LED2);
 
 DigitalInOut sirenPin(PE_10);
 
+// Constructor UnbufferedSerial inicializa un objeto con pones RX TX y baudrate
 UnbufferedSerial uartUsb(USBTX, USBRX, 115200);
 
+// Constructor AnalogIn inicializa objeto con un pin
 AnalogIn potentiometer(A0);
 AnalogIn lm35(A1);
 
