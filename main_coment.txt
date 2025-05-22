@@ -23,6 +23,8 @@ DigitalInOut sirenPin(PE_10);         // Objeto que permite entrada/salida en el
 // OBJETO: Creación de un objeto uartUsb usando el constructor de la clase UnbufferedSerial
 UnbufferedSerial uartUsb(USBTX, USBRX, 115200); // Comunicación serie con velocidad de 115200 baudios
 
+//mas rapido, no hay buffer y puedo seleccionar el baudrate.
+
 //=====[Declaración de objeto de la clase AnalogIn]==========================
 // CLASE: AnalogIn -> Maneja entradas analógicas en Mbed
 // CONSTRUCTOR: Recibe el pin analógico como argumento
